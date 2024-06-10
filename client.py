@@ -1,5 +1,10 @@
 import socket
 import threading
+import sys
+import colorama
+
+
+colorama.init()
 
 # Choosing Nickname and room
 nickname = input("Choose your nickname: ")
@@ -32,8 +37,12 @@ def write():
     while True:
         message = '{}: {}'.format(nickname, input(''))
         client.send(message.encode('utf-8'))
-        message = '{}: {}'.format(room, input(''))
-        client.send(message.encode('utf-8'))
+        
+        # message = '{}: {}'.format(room, input(''))
+        # client.send(message.encode('utf-8'))
+        
+        sys.stdout.write("\033[F") # Cursor up one line
+        sys.stdout.write("\033[K") # Clear to the end of line
         
 
 # Starting Threads For Listening And Writing
