@@ -14,11 +14,11 @@ def receive():
         try:
             # Receive Message From Server
             # If 'NICK' Send Nickname
-            message = client.recv(1024).decode('ascii')
+            message = client.recv(1024).decode('utf-8')
             if message == 'NICK':
-                client.send(nickname.encode('ascii'))
+                client.send(nickname.encode('utf-8'))
             elif message == 'ROOM':
-                client.send(room.encode('ascii'))
+                client.send(room.encode('utf-8'))
             else:
                 print(message)
         except:
@@ -31,9 +31,9 @@ def receive():
 def write():
     while True:
         message = '{}: {}'.format(nickname, input(''))
-        client.send(message.encode('ascii'))
+        client.send(message.encode('utf-8'))
         message = '{}: {}'.format(room, input(''))
-        client.send(message.encode('ascii'))
+        client.send(message.encode('utf-8'))
         
 
 # Starting Threads For Listening And Writing

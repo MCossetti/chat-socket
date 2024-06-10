@@ -42,7 +42,7 @@ def handle(client):
             room = getRoom(client)
             client.close()
             nickname = nicknames[index]
-            broadcast('{} left!'.format(nickname).encode('ascii'), room)
+            broadcast('{} left!'.format(nickname).encode('utf-8'), room)
             nicknames.remove(nickname)
             break
             
@@ -55,14 +55,14 @@ def receive():
         print("Connected with {}".format(str(address)))
 
         # Request And Store Nickname
-        client.send('NICK'.encode('ascii'))
-        nickname = client.recv(1024).decode('ascii')
+        client.send('NICK'.encode('utf-8'))
+        nickname = client.recv(1024).decode('utf-8')
         nicknames.append(nickname)
         clients.append(client)
         
         # Request and Store Room
-        client.send('ROOM'.encode('ascii'))
-        room = client.recv(1024).decode('ascii')
+        client.send('ROOM'.encode('utf-8'))
+        room = client.recv(1024).decode('utf-8')
         
         #Test if dictionary key exists, if it doesn't exists creates it
         try: 
@@ -73,8 +73,8 @@ def receive():
 
         # Print And Broadcast Nickname
         print("Nickname is {}".format(nickname))
-        broadcast("{} joined room {}!".format(nickname,room).encode('ascii'), room)
-        client.send('Connected to server!'.encode('ascii'))
+        broadcast("{} joined room {}!".format(nickname,room).encode('utf-8'), room)
+        client.send('Connected to server!'.encode('utf-8'))
         print("Rooms: {}".format(rooms))
 
         # Start Handling Thread For Client
