@@ -6,9 +6,8 @@ from colorama import Fore, Style
 colorama.init()
 
 # Connection Data
-host = input("Choose Server IP: ") 
-port = int(input("Choose Server Port Number: "))
-
+host = '127.0.0.1'
+port = 55557
 
 # Starting Server
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

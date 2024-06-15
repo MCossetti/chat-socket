@@ -6,20 +6,12 @@ import colorama
 
 colorama.init()
 
-#choosing server ip and port
-serverip = input("Choose Server IP: ")
-serverport = input("Choose Server Port: ")
-
-#converting serverport to integer
-serverport = int(serverport)
-
 # Choosing Nickname and room
 nickname = input("Choose your nickname: ")
 room = input("Choose your room: ")
-
 # Connecting To Server
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect((serverip, serverport))
+client.connect(('127.0.0.1', 55557))
 
 # Listening to Server and Sending Nickname
 def receive():
