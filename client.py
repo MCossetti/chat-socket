@@ -2,16 +2,33 @@ import socket
 import threading
 import sys
 import colorama
+import signal
+
+# Function to handle the SIGINT signal (Ctrl+C)
+def signal_handler(sig, frame):
+    print("\nProgram interrupted by user.")
+    sys.exit(0)
+
+# Set the signal handler for SIGINT (Ctrl+C)
+signal.signal(signal.SIGINT, signal_handler)
 
 
 colorama.init()
+
+
+#choosing server ip and port
+serverip = input("Choose Server IP: ")
+serverport = input("Choose Server Port: ")
+
+#converting serverport to integer
+serverport = int(serverport)
 
 # Choosing Nickname and room
 nickname = input("Choose your nickname: ")
 room = input("Choose your room: ")
 # Connecting To Server
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(('127.0.0.1', 55557))
+client.connect((serverip, serverport))
 
 # Listening to Server and Sending Nickname
 def receive():
