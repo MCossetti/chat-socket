@@ -2,6 +2,15 @@ import socket
 import threading
 import sys
 import colorama
+import signal
+
+# Function to handle the SIGINT signal (Ctrl+C)
+def signal_handler(sig, frame):
+    print("\nProgram interrupted by user.")
+    sys.exit(0)
+
+# Set the signal handler for SIGINT (Ctrl+C)
+signal.signal(signal.SIGINT, signal_handler)
 
 
 colorama.init()
