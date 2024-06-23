@@ -3,15 +3,6 @@ import threading
 import colorama
 from colorama import Fore, Style
 import sys
-import signal
-
-# Function to handle the SIGINT signal (Ctrl+C)
-def signal_handler(sig, frame):
-    print("\nProgram interrupted by user.")
-    sys.exit(0)
-
-# Set the signal handler for SIGINT (Ctrl+C)
-signal.signal(signal.SIGINT, signal_handler)
 
 colorama.init()
 
@@ -35,7 +26,12 @@ available_colors = [Fore.RED, Fore.GREEN, Fore.YELLOW, Fore.BLUE, Fore.MAGENTA, 
 # Sending Messages To All Connected Clients
 def broadcast(message, room):
     for client in rooms[f'{room}']:
-        client.send(message)
+       try:
+            client.send(message)
+       except Exception as e:
+            print(f"Error broadcasting to client: {e}")
+            handle_disconnect(client)
+ 
 
 # Find the room of the client
 def getRoom(client):
@@ -49,22 +45,47 @@ def handle(client):
         try:
             # Broadcasting Messages
             message = client.recv(1024).decode('utf-8')
+            if not message:
+                handle_disconnect(client)
+                break
             room = getRoom(client)
             nickname = nicknames[clients.index(client)]
             color = colors[nickname]
             colored_message = "{}{}{}".format(color, message, Style.RESET_ALL)
             broadcast(colored_message.encode('utf-8'), room)
-        except:
-            # Removing And Closing Clients
-            index = clients.index(client)
-            clients.remove(client)
-            room = getRoom(client)
-            client.close()
-            nickname = nicknames[index]
-            broadcast('{}{} left!{}'.format(colors[nickname], nickname, Style.RESET_ALL).encode('utf-8'), room)
-            nicknames.remove(nickname) 
-            colors.pop(nickname)  # Remove color association
+        except OSError as e:
+            print(f"(OSError: {e})")
+            handle_disconnect(client)
             break
+        except ConnectionResetError as e:
+            print(f"ConnectionResetError: Client {client} disconnected unexpectedly.")
+            handle_disconnect(client)
+            break
+        except Exception as e:
+            print(f"Error: {e}")
+            handle_disconnect(client)
+            break
+
+
+def handle_disconnect(client):
+    try:
+        index = clients.index(client)
+        clients.remove(client)
+        room = getRoom(client)
+        
+        # Remove client from room list
+        if room in rooms and client in rooms[room]:
+            rooms[room].remove(client)
+
+        client.close()
+        nickname = nicknames[index]
+        broadcast('{}{} left!{}'.format(colors[nickname], nickname, Style.RESET_ALL).encode('utf-8'), room)
+        print(f"{nickname} left room {room}")
+        nicknames.remove(nickname)
+        colors.pop(nickname)
+    except ValueError:
+        pass  # If client is already removed or isn't in the list
+
 
 # Receiving / Listening Function
 def receive():
@@ -87,7 +108,7 @@ def receive():
         client.send('ROOM'.encode('utf-8'))
         room = client.recv(1024).decode('utf-8')
         
-        #Test if dictionary key exists, if it doesn't exists creates it
+        #Test if dictionary key exists, if not: creates it
         try: 
             rooms[f'{room}'].append(client)
         except KeyError: 
@@ -103,4 +124,5 @@ def receive():
         thread = threading.Thread(target=handle, args=(client,))
         thread.start()
 
-receive()
+if __name__ = '__main__':
+    receive()
