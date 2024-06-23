@@ -2,15 +2,6 @@ import socket
 import threading
 import sys
 import colorama
-import signal
-
-# Function to handle the SIGINT signal (Ctrl+C)
-def signal_handler(sig, frame):
-    print("\nProgram interrupted by user.")
-    sys.exit(0)
-
-# Set the signal handler for SIGINT (Ctrl+C)
-signal.signal(signal.SIGINT, signal_handler)
 
 
 colorama.init()
@@ -30,6 +21,8 @@ room = input("Choose your room: ")
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect((serverip, serverport))
 
+
+
 # Listening to Server and Sending Nickname
 def receive():
     while True:
@@ -48,23 +41,34 @@ def receive():
             print("An error occured!")
             client.close()
             break
+        
             
 # Sending Messages To Server
-def write():
+def write(): 
     while True:
-        message = '{}: {}'.format(nickname, input(''))
-        client.send(message.encode('utf-8'))
-        
-        # message = '{}: {}'.format(room, input(''))
-        # client.send(message.encode('utf-8'))
-        
-        sys.stdout.write("\033[F") # Cursor up one line
-        sys.stdout.write("\033[K") # Clear to the end of line
+       try:
+           message = '{}: {}'.format(nickname, input(''))
+           client.send(message.encode('utf-8'))
+           sys.stdout.write("\033[F") # Cursor up one line
+           sys.stdout.write("\033[K") # Clear to the end of line
+       except:
+           print("\nException ocurred")
+
+
+    
+if __name__ == "__main__":
+
+
+    # Starting Threads For Listening And Writing
+    receive_thread = threading.Thread(target=receive)
+    write_thread = threading.Thread(target=write)
+
+    write_thread.start()
+    receive_thread.start()
+
+    write_thread.join()
+    receive_thread.join()
+
+  
         
 
-# Starting Threads For Listening And Writing
-receive_thread = threading.Thread(target=receive)
-receive_thread.start()
-
-write_thread = threading.Thread(target=write)
-write_thread.start()
